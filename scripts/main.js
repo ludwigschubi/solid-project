@@ -29,6 +29,7 @@ $('#view').click(async function loadProfile() {
 
   // Display their details
   const fullName = store.any($rdf.sym(person), FOAF('name'));
+  
   $('#fullName').text(fullName && fullName.value);
 
   // Display their friends
@@ -45,10 +46,27 @@ $('#view').click(async function loadProfile() {
   });
 });
 
+$("#checkForUser").click(async function(){
+  var xhr = new XMLHttpRequest();
+  var url = $("#profile").val();
+
+  xhr.onreadystatechange = () => {
+    if( xhr.responseType == XMLHttpRequest.DONE) {
+      if (xhr.status == 200) {
+        console.log("Account has already been created");
+      } else {
+        console.log("Account is still available!");
+      }
+    }
+  }
+
+  xhr.open("HEAD", url);
+  xhr.send();
+});
+
 $("#addFriend").click(async function addFriend(){
   const friendURI = $("#friend").val();
   const person = $('#profile').val();
-
   const store = $rdf.graph();
   const fetcher = new $rdf.Fetcher(store);
   const updater = new $rdf.UpdateManager(store);

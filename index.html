@@ -36,6 +36,14 @@
     <input id="age" placeholder="Enter your age:">
     <button id="editAge" type="button">Edit your age</button>
   </div>
+  <div>
+    <button id="checkForUser" type="button">Check if profile is available</button>
+  </div>
+  <form method="POST" action="https://newuser.solid.community/">
+    <input type="text" id="username" placeholder="username">
+    <input type="email" id="email" placeholder="email">
+    <button type="submit">Submit</button>
+  </form>
   <script src="scripts/jquery.js"></script>
   <script src="scripts/solid-auth-client.bundle.js"></script>
   <script src="scripts/rdflib.min.js"></script>
