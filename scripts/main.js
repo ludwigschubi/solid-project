@@ -16,6 +16,7 @@ solid.auth.trackSession(session => {
   if (loggedIn) {
     $('#user').text(session.webId);
     // Use the user's WebID as default profile
+    console.log(session)
     sessionDict = session
     if (!$('#profile').val())
       $('#profile').val(session.webId);
@@ -94,21 +95,17 @@ $("#addFriend").click(async function addFriend(){
 })
 
 $("#deleteEmail").click(async function deleteEmail(){
-  console.log(sessionDict)
+  const store = $rdf.graph();
+  const fetcher = new $rdf.Fetcher(store);
+  const updater = new $rdf.UpdateManager(store);
 
-  var xhr = new XMLHttpRequest();
-  var url = "https://ludwigschubert.solid.community/profile/card";
-  var body = "DELETE DATA { <https://ludwigschubert.solid.community/profile/card#me> <http://www.w3.org/2006/vcard/ns#hasEmail> <https://ludwigschubert.solid.community/profile/card#id1549354058231> .}"
-
-  xhr.onreadystatechange = () => {
-    if( xhr.responseType == XMLHttpRequest.DONE) {
-      console.log("Successfully deleted")
-    }
+  const url = "https://ludwigschubert.solid.community/profile/card";
+  const query = "DELETE DATA { <https://ludwigschubert.solid.community/profile/card#me> <http://www.w3.org/2006/vcard/ns#hasEmail> <https://ludwigschubert.solid.community/profile/card#id1549376856399> .}"
+  const options = {
+    noMeta: true,
+    contentType: "application/sparql-update",
+    body: query
   }
-  xhr.open("PATCH", url);
-  xhr.setRequestHeader("content-type", "application/sparql-update");
-  xhr.setRequestHeader("authorization", "Bearer " + sessionDict.authorization.id_token);
-  xhr.send(body);
 
-  //store.fetcher.webOperation('PATCH', uri, options);
+  store.fetcher.webOperation("PATCH", url, options)
 })
