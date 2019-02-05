@@ -1,4 +1,7 @@
 const FOAF = $rdf.Namespace('http://xmlns.com/foaf/0.1/');
+const VCARD = $rdf.Namespace("http://http://www.w3.org/2006/vcard/ns#");
+
+var sessionDict = {};
 
 // Log the user in and out on click
 const popupUri = 'popup.html';
@@ -13,6 +16,7 @@ solid.auth.trackSession(session => {
   if (loggedIn) {
     $('#user').text(session.webId);
     // Use the user's WebID as default profile
+    sessionDict = session
     if (!$('#profile').val())
       $('#profile').val(session.webId);
   }
@@ -44,6 +48,9 @@ $('#view').click(async function loadProfile() {
                 .click(() => $('#profile').val(friend.value))
                 .click(loadProfile)));
   });
+
+  var email = store.any($rdf.sym(person), VCARD("hasEmail"));
+  console.log(email)
 });
 
 $("#checkForUser").click(async function(){
@@ -64,6 +71,11 @@ $("#checkForUser").click(async function(){
   xhr.send();
 });
 
+$("#submitUser").click(function (){
+  var username = $("#username").val();
+  $("#newUserForm").attr("action", "https://" + username + ".solid.community/")
+});
+
 $("#addFriend").click(async function addFriend(){
   const friendURI = $("#friend").val();
   const person = $('#profile').val();
@@ -71,7 +83,7 @@ $("#addFriend").click(async function addFriend(){
   const fetcher = new $rdf.Fetcher(store);
   const updater = new $rdf.UpdateManager(store);
 
-  let doc = $rdf.sym("https://ludwigschubi1.solid.community/profile/card#me");
+  let doc = $rdf.sym($("#profile").val());
 
   let ins = $rdf.st(person, FOAF("knows"), friend, doc);
   let del = [];
@@ -86,7 +98,7 @@ $("#editAge").click(async function editAge(){
   const store = $rdf.graph();
   const fetcher = new $rdf.Fetcher(store);
   const updater = new $rdf.UpdateManager(store);
-  let doc = $rdf.sym("https://ludwigschubi1.solid.community/profile/card#me");
+  let doc = $rdf.sym($("#profile").val());
 
   age = $("#age").val();
 
