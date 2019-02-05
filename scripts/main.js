@@ -33,7 +33,7 @@ $('#view').click(async function loadProfile() {
 
   // Display their details
   const fullName = store.any($rdf.sym(person), FOAF('name'));
-  
+
   $('#fullName').text(fullName && fullName.value);
 
   // Display their friends
