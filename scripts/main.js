@@ -1,5 +1,5 @@
-const FOAF = $rdf.Namespace('http://xmlns.com/foaf/0.1/');
-const VCARD = $rdf.Namespace("http://http://www.w3.org/2006/vcard/ns#");
+const FOAF = new $rdf.Namespace('http://xmlns.com/foaf/0.1/');
+const VCARD = new $rdf.Namespace("http://www.w3.org/2006/vcard/ns#");
 
 var sessionDict = {};
 
@@ -34,6 +34,7 @@ $('#view').click(async function loadProfile() {
 
   // Display their details
   const fullName = store.any($rdf.sym(person), FOAF('name'));
+  console.log(store.any($rdf.sym(person), null, null, $rdf.sym(person).doc()).value);
 
   $('#fullName').text(fullName && fullName.value);
 
@@ -50,8 +51,7 @@ $('#view').click(async function loadProfile() {
                 .click(loadProfile)));
   });
 
-  var email = store.any($rdf.sym(person), VCARD("hasEmail"));
-  console.log(email)
+  getEmailAccounts(person);
 });
 
 $("#checkForUser").click(async function(){
@@ -79,33 +79,121 @@ $("#submitUser").click(function (){
 
 $("#addFriend").click(async function addFriend(){
   const friendURI = $("#friend").val();
-  const person = $('#profile').val();
+  const personURI = $('#profile').val();
+
   const store = $rdf.graph();
   const fetcher = new $rdf.Fetcher(store);
-  const updater = new $rdf.UpdateManager(store);
 
-  let doc = $rdf.sym($("#profile").val());
+  addFriendQuery = "INSERT DATA { <" + personURI  + "> <http://xmlns.com/foaf/0.1/knows> <" + friendURI + ">.}"
+  console.log(addFriendQuery);
+  const options = {
+    noMeta: true,
+    contentType: "application/sparql-update",
+    body: addFriendQuery
+  }
 
-  let ins = $rdf.st(person, FOAF("knows"), friend, doc);
-  let del = [];
-  updater.update(del, ins, (uri, ok, message) => {
-    if (ok) console.log("Friend added");
-    else alert(message);
-  });
+  fetcher.webOperation("PATCH", personURI, options);
 })
 
-$("#deleteEmail").click(async function deleteEmail(){
+function deleteEmail(emailId){
   const store = $rdf.graph();
   const fetcher = new $rdf.Fetcher(store);
-  const updater = new $rdf.UpdateManager(store);
+
+  const profileURI = $("#profile").val();
 
   const url = "https://ludwigschubert.solid.community/profile/card";
-  const query = "DELETE DATA { <https://ludwigschubert.solid.community/profile/card#me> <http://www.w3.org/2006/vcard/ns#hasEmail> <https://ludwigschubert.solid.community/profile/card#id1549376856399> .}"
+  const query = "DELETE DATA { <" + profileURI  + "> <http://www.w3.org/2006/vcard/ns#hasEmail>  <https://ludwigschubert.solid.community/profile/card#" + emailId + ">.}"
+  console.log(query)
   const options = {
     noMeta: true,
     contentType: "application/sparql-update",
     body: query
   }
 
+  store.fetcher.webOperation("PATCH", url, options)
+};
+
+function getEmailAccounts(url){
+  const store = $rdf.graph();
+  const fetcher = new $rdf.Fetcher(store);
+
+  let me = store.sym(url);
+  let profile = me.doc();
+  var emails = [];
+
+  $("#email").empty();
+  fetcher.load(profile).then(response => {
+    store.each(me, VCARD("hasEmail")).forEach((emailId) => {
+      var email = {}
+      emailId = emailId.value;
+      email["id"] = emailId.split("#")[1]
+      store.each($rdf.sym(emailId), VCARD("value")).forEach((emailAddress) => {
+        emailAddress = emailAddress.value;
+        emailAddress = emailAddress.split(":")[1];
+        email["email"] = emailAddress;
+      })
+      emails.push(email);
+      $("#email").append(
+        $("<li>").append(
+          email.email + "<button id='" + email.id  + "' onclick='deleteEmail(\"" + email.id + "\")'>Delete</button>"
+        ))
+    });
+    console.log(emails);
+  });
+};
+
+$("#setProfilePic").click(async function setProfilePic(){
+  var filePath = $("#profilePic").val();
+  console.log(filePath);
+  filePath = filePath.split("\\")[2];
+  console.log(filePath);
+  /*
+  const friendURI = $("#friend").val();
+  const personURI = $('#profile').val();
+
+  const store = $rdf.graph();
+  const fetcher = new $rdf.Fetcher(store);
+
+  addFriendQuery = "INSERT DATA { <" + personURI  + "> <http://xmlns.com/foaf/0.1/knows> <" + friendURI + ">.}"
+  console.log(addFriendQuery);
+  const options = {
+    noMeta: true,
+    contentType: "application/sparql-update",
+    body: addFriendQuery
+  }
+
+  fetcher.webOperation("PATCH", personURI, options);*/
+});
+
+$("#setEmail").click(async function setEmail(){
+  const store = $rdf.graph();
+  const fetcher = new $rdf.Fetcher(store);
+  const updater = new $rdf.UpdateManager(store);
+
+  const url = "https://ludwigschubert.solid.community/profile/card";
+
+  //set the email according to its value:
+  const newEmail = $('#email').val()
+  const setEmailQuery = "INSERT DATA { <https://ludwigschubert.solid.community/profile/card#id1545410066782> <http://www.w3.org/2006/vcard/ns#value> <mailto:" + newEmail  + ".}"
+
+  //link the email on the profile:
+  const linkEmailQuery = "INSERT DATA { <https://ludwigschubert.solid.community/profile/card#me> <http://www.w3.org/2006/vcard/ns#hasEmail> <https://ludwigschubert.solid.community/profile/card#id1545410066782> .}"
+
+  var options = {
+    noMeta: true,
+    contentType: "application/sparql-update",
+    body: setEmailQuery
+  }
+
+  //send request
+  store.fetcher.webOperation("PATCH", url, options)
+
+  options = {
+    noMeta: true,
+    contentType: "application/sparql-update",
+    body: linkEmailQuery
+  }
+
+  //send request
   store.fetcher.webOperation("PATCH", url, options)
 })
