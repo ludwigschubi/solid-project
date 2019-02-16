@@ -6,13 +6,13 @@
 <h1>Documentation</h1>This is the official documentation of the software used within this project.<div><br/>
 <p><h2><b>(CREATING, UPDATING, DELETING) Inserting information into a Solid pod:</b></h2></p><p>To insert information, like adding a friend, into a Solid pod we first need the address of the resource we want to insert information into (In this case the address of the webId and the address of the friends webId, which we will insert): </p><div><pre>const bobsWebId = "https://bob.solid.community/profile/card#me"; //own pod
 const alicesWebId = "https://alice.solid.community/profile/card#me"; //pod of our friend</pre>Then we need to get the graph of the pod in which we want to insert information: <br /><pre>const store = $rdf.graph();
-const fetcher = new $rdf.Fetcher(store);</pre>Next, we build the SPARQL-Query that inserts information into our Pod:<br /><pre>addFriendQuery = "INSERT DATA { <" + bobsWebId  + "> <http: 0.1="" foaf="" knows="" xmlns.com=""> &lt;" + alicesWebId + "&gt;.}"
+const fetcher = new $rdf.Fetcher(store);</pre>Next, we build the SPARQL-Query that inserts information into our Pod:<br /><pre>addFriendQuery = "INSERT DATA { <" + bobsWebId  + "> &lthttp://xmlns.com/foaf/0.1/knows> &lt" + alicesWebId + "&gt;.}"
 //When deleting use DELETE instead of INSERT
 const options = {
   noMeta: true,
   contentType: "application/sparql-update",
   body: addFriendQuery
-}</http:></http:></pre>Last, we send our request to the Solid pod:<br /><pre>fetcher.webOperation("PATCH", bobsWebId, options);<br /></http:></pre><p><http: 0.1="" foaf="" knows="" xmlns.com="">
+}</http:></http:></pre>Last, we send our request to the Solid pod:<br /><pre>fetcher.webOperation("PATCH", bobsWebId, options);<br /></pre><p>
 <br/><h2><b>(READING) Getting information from a Solid pod:</b></h2></p>
 <p>To read information from a Solid pod, you will again, need the address of the resource you want to read. After initializing the graph and loading the resource into it:</http:></p>
 <pre>const person = "https://bob.solid.community/profile/card#me";
