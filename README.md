@@ -6,7 +6,8 @@
 <h1>Documentation</h1>This is the official documentation of the software used within this project.<div><br/>
 <p><h2><b>(CREATING, UPDATING, DELETING) Inserting information into a Solid pod:</b></h2></p><p>To insert information, like adding a friend, into a Solid pod we first need the address of the resource we want to insert information into (In this case the address of the webId and the address of the friends webId, which we will insert): </p><div><pre>const bobsWebId = "https://bob.solid.community/profile/card#me"; //own pod
 const alicesWebId = "https://alice.solid.community/profile/card#me"; //pod of our friend</pre>Then we need to get the graph of the pod in which we want to insert information: <br /><pre>const store = $rdf.graph();
-const fetcher = new $rdf.Fetcher(store);</pre>Next, we build the SPARQL-Query that inserts information into our Pod:<br /><pre>addFriendQuery = "INSERT DATA { <" + bobsWebId  + "> <http: 0.1="" foaf="" knows="" xmlns.com=""> &lt;" + alicesWebId + "&gt;.}"<http: 0.1="" foaf="" knows="" xmlns.com="">
+const fetcher = new $rdf.Fetcher(store);</pre>Next, we build the SPARQL-Query that inserts information into our Pod:<br /><pre>addFriendQuery = "INSERT DATA { <" + bobsWebId  + "> <http: 0.1="" foaf="" knows="" xmlns.com=""> &lt;" + alicesWebId + "&gt;.}"
+//When deleting use DELETE instead of INSERT
 const options = {
   noMeta: true,
   contentType: "application/sparql-update",
