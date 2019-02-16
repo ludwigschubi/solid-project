@@ -47,7 +47,7 @@ await fetcher.load(person);</pre>
 <li>A URI for a person:
   <p>For example: &lthttps://ludwigschubert.solid.community/profile/card#me></p>
 </li>
-<li>A document that holds information of a person (a Triplestore):</li>
+<li>A document that holds information of a person (a Triplestore):
 <p>The profile that is created when registering for solid contains information about my name, where my storage, account or my inbox are: </p>
 <b>Note:</b><p>The subject can be reused when writing triples by separating triples that reference the same subject with a semicolon.</p>
 <pre>@prefix : &lt#>.
@@ -71,7 +71,7 @@ pro:card a n0:PersonalProfileDocument; n0:maker :me; n0:primaryTopic :me.
     solid:privateTypeIndex &lt/settings/privateTypeIndex.ttl>;
     solid:publicTypeIndex &lt/settings/publicTypeIndex.ttl>;
     n0:name "Ludwig Schubert".
-</pre>
+</pre></li>
 <p>---------------------------------HAVE TO'S--------------------------------</p>
 <p>+    Add .acl basic</p>
 </html>
